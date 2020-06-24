@@ -1,10 +1,8 @@
-// const run = require('../utils/run');
+/* eslint-disable no-console */
+const fn = (x, mappingFn) => {
+  console.log(mappingFn ? mappingFn(x) : x);
+};
 
-// run(state => {
-// 	console.log(global.input);
-// 	console.log(state);
-// }, 'this is input');
+fn.map = (mappingFn) => (x) => fn(x, mappingFn);
 
-const lettersRegex = /^[a-z]*/;
-
-console.log('this1 is a string'.match(lettersRegex));
+fn.map((i) => i * 10);

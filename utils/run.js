@@ -7,16 +7,16 @@
 // input is only set to global while whilte the run runs
 // after the run completes, input is not available on global
 function run(parser, input) {
-	global.input = input;
-	const tree = parser({
-		index: 0,
-		hasError: false,
-		error: null,
-		parsed: null,
-		lines: 0,
-	});
-	global.input = null;
-	return tree;
+  global.input = input;
+  const tree = parser({
+    index: 0,
+    hasError: false,
+    error: null,
+    parsed: null,
+    lines: 0,
+  });
+  global.input = null;
+  return tree;
 }
 
 module.exports = run;

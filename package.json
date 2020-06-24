@@ -1,14 +1,39 @@
 {
-  "name": "combinatorjs",
+  "name": "revamp-parser",
   "version": "1.0.0",
-  "description": "",
+  "description": "Parser Combinator Library for creating complex parsers easily",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MananTank/Revamp.git"
+  },
+  "keywords": [
+    "parser",
+    "parser",
+    "combinator",
+    "functional",
+    "parser",
+    "compiler"
+  ],
   "author": "Manan Tank",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MananTank/Revamp/issues"
+  },
+  "homepage": "https://github.com/MananTank/Revamp#readme",
   "devDependencies": {
-    "jest": "^26.0.1"
+    "eslint": "^7.3.1",
+    "eslint-config-airbnb": "^18.2.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.21.2",
+    "eslint-plugin-prettier": "^3.1.4",
+    "jest": "^26.1.0",
+    "prettier": "^2.0.5"
   }
 }

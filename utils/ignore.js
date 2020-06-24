@@ -1,5 +1,5 @@
 function ignore() {
-	return null;
+  return null;
 }
 
 module.exports = ignore;

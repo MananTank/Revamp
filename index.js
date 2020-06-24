@@ -1,21 +1,27 @@
 const run = require('./utils/run');
-// const ignore = require('./utils/ignore');
-const { exact, letter, letters, digits, digit } = require('./parsers/string');
-// const { whitespace } = require('./parsers/string');
+const ignore = require('./utils/ignore');
+const { string, whitespace, digits } = require('./parsers/string');
+const { zeroOrMore } = require('./combinators/more');
+const debug = require('./combinators/debug');
 const seq = require('./combinators/sequence');
-// const { product } = require('prelude-ls');
-// const or = require('./combinators/or');
+const { letters } = require('./parsers/string');
 
-const { nOrMore, zeroOrMore, oneOrMore } = require('./combinators/more');
+// string:hello
+// number:42
 
-// const cools = oneOrMore(exact('cool'));
+// [
+//    {
+//       type: string,
+//       value: 'hello'
+//    },
+//    {
+//       type: number,
+//       value: 42
+//    }
+// ]
 
-// const parser = seq([cools, letters()]);
+const parser = debug(seq([letters(), digits()]));
 
-const tree = run(letters(), 'coolthis is some string');
+const tree = run(parser, 'cooladfasfdasdf123hello');
 
-console.clear();
-
-console.log('---------------');
-console.log(tree);
-console.log('---------------');
+console.log('tree', tree);

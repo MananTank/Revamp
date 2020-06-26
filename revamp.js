@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-shadow */
 /* eslint-disable no-console */
 /* eslint-disable strict */
@@ -16,106 +17,178 @@ const parse = (parser, input) => {
   return endState;
 };
 
-// PARSER ---------------
-const parser = (logic, options = {}) => (state) => {
-  if (state.error) return state;
-  const { error, parsed } = logic(state.index);
+function createParser(logic, options = {}, info) {
+  function parser(state) {
+    if (state.error) return state;
+    const { error, parsed } = logic(state);
+    let newIndex;
 
-  if (!error) {
-    const newState = Object.freeze({
-      ...state,
-      parsed: options.revamp ? options.revamp(parsed) : parsed,
-      index: state.index + parsed.length,
-    });
+    if (Array.isArray(parsed)) {
+      newIndex = parsed.join('').length;
+    } else {
+      newIndex = state.index + parsed.length;
+    }
 
-    const nextParser = options.next && options.next(newState.parsed);
-    return nextParser ? nextParser(newState) : newState;
+    if (!error) {
+      const newState = Object.freeze({
+        ...state,
+        parsed: options.revamp ? options.revamp(parsed) : parsed,
+        index: newIndex,
+      });
+
+      const nextParser = options.next && options.next(newState.parsed);
+      return nextParser ? nextParser(newState) : newState;
+    }
+    return Object.freeze({ ...state, error });
   }
-  return Object.freeze({ ...state, error });
-};
 
-// STR: ---------------
-const str = (s, op) => {
-  const strParser = parser((i) => {
+  parser.type = info.type;
+  parser.parses = info.parses;
+  return parser;
+}
+
+function str(s, op) {
+  const logic = ({ index: i }) => {
     if (global.input.slice(i).startsWith(s)) return { parsed: s };
     return { error: `expected ${s}, got ${global.input.slice(i, i + s.length)}...` };
-  }, op);
+  };
 
-  strParser.type = 'string';
-  strParser.target = `"${s}"`;
-  return strParser;
-};
+  return createParser(logic, op, { type: 'string', parses: `"${s}"` });
+}
 
-// REGEX -----------------------------------------
-const regex = (r, op) => parser((i) => {
-  const result = global.input.slice(i).match(r);
-  if (result) return { parsed: result[0] };
-  return { error: `can not match regex at -> "${global.input.slice(i, i + 10)}..."` };
-}, op);
+function regex(rExp, op, parses) {
+  const logic = ({ index: i }) => {
+    const result = global.input.slice(i).match(rExp);
+    if (result) return { parsed: result[0] };
+    return { error: `can not match regex at -> "${global.input.slice(i, i + 10)}..."` };
+  };
 
-const letters = (op) => regex(/^[a-z]+/, op);
-const letter = (op) => regex(/^[a-z]/, op);
-const number = (op = {}) => regex(/^[0-9]/, op);
-const numbers = (op = {}) => regex(/^[0-9]+/, op);
-const alphaNumeric = (op = {}) => regex(/^[a-zA-Z0-9]/, op);
-const alphaNumerics = (op = {}) => regex(/^[a-zA-Z0-9]+/, op);
-const oneWhitespace = (op = {}) => regex(/^[\s]/, op);
-const whitespace = (op = {}) => regex(/^[\s]+/, op);
-const optionalWhitespace = (op = {}) => regex(/^[\s]*/, op);
+  return createParser(logic, op, { type: 'regex', parses });
+}
 
-// MORE ------------------------------
-const zeroOrMore = (parser, op = {}) => (state) => {
-  if (state.error) return state;
-  let newState = state;
-  let parsed = [];
-  while (true) {
-    newState = parser(newState);
-    if (newState.error) {
-      parsed = op.revamp ? op.revamp(parsed) : parsed;
-      return { ...newState, parsed, error: null };
-    }
-    parsed.push(newState.parsed);
-  }
-};
+const letters = (op) => regex(/^[a-z]+/, op, 'letters');
+const letter = (op) => regex(/^[a-z]/, op, 'letter');
+const number = (op) => regex(/^[0-9]/, op, 'number');
+const numbers = (op) => regex(/^[0-9]+/, op, 'numbers');
+const alphaNumeric = (op) => regex(/^[a-zA-Z0-9]/, op, 'alpha numeric');
+const alphaNumerics = (op) => regex(/^[a-zA-Z0-9]+/, op, 'alpha numerics');
+const oneWhitespace = (op) => regex(/^[\s]/, op, 'one whitespace');
+const whitespace = (op) => regex(/^[\s]+/, op, 'whitespace');
+const optionalWhitespace = (op) => regex(/^[\s]*/, op, 'optional whitespace');
 
-const nOrMore = (n, parser, op = {}) => (state) => {
-  if (state.error) return state;
-  let newState = state;
-  let parsed = [];
-  let i = 0;
-  while (true) {
-    newState = parser(newState);
-    if (newState.error) {
-      if (i >= n) {
-        parsed = op.revamp ? op.revamp(parsed) : parsed;
-        return { ...newState, parsed, error: null };
+function zeroOrMore(parser, op) {
+  const logic = (state) => {
+    let newState = state;
+    const parsed = [];
+    while (true) {
+      newState = parser(newState);
+      if (newState.error) {
+        return { parsed };
       }
-      return {
-        ...state,
-        error: `expected ${parser.type} parser to to parse ${parser.target} ${n} or more times, but parsed ${i} times instead`,
-      };
+      parsed.push(newState.parsed);
+    }
+  };
+  return createParser(logic, op, { type: 'zeroOrMore', parses: parser.parses });
+}
+
+function nOrMore(n, parser, op) {
+  const logic = (state) => {
+    let newState = state;
+    const parsed = [];
+    let i = 0;
+    while (true) {
+      newState = parser(newState);
+      if (newState.error) {
+        if (i >= n) return { parsed };
+        return {
+          error: `expected ${parser.type} parser to to parse ${parser.target} ${n} or more times, but parsed ${i} times instead`,
+        };
+      }
+      parsed[i++] = newState.parsed;
+    }
+  };
+
+  return createParser(logic, op, { type: `${n} or more ${parser.type}`, parses: parser.parses });
+}
+
+function oneOf(parsers, op) {
+  const parserList = parsers.map((p) => p.parses).join(', ');
+
+  const logic = (state) => {
+    let newState = state;
+
+    for (const parser of parsers) {
+      newState = parser(state);
+      if (!newState.error) {
+        return { parsed: newState.parsed };
+      }
     }
 
-    parsed[i++] = newState.parsed;
-  }
-};
+    return { error: `none of [${parserList}] in oneOf parser could parse` };
+  };
+
+  return createParser(logic, op, {
+    type: 'one of',
+    parses: `one of [${parserList}]`,
+  });
+}
+
+function upTo(parser, op) {
+  const logic = (state) => {
+    let i = state.index;
+    let newState = state;
+    let parsed = '';
+
+    while (i < global.input.length) {
+      newState = parser({ ...state, index: i });
+      if (!newState.error) return { parsed };
+      parsed += global.input[i];
+      i++;
+    }
+
+    return {
+      ...state,
+      error: `end of input reached, but could not parse ${parser.parses} in upTo`,
+    };
+  };
+
+  return createParser(logic, op, { type: 'upTo', parses: parser.parses });
+}
+
+function optional(parser, op = {}) {
+  return (state) => {
+    if (state.error) return state;
+    const newState = parser(state);
+    if (newState.error) return state;
+    return { ...newState, parsed: op.revamp ? op.revamp(newState.parsed) : newState.parsed };
+  };
+}
+
+function seq(parsers, op) {
+  const parserList = parsers.map((p) => p.parses).join(', ');
+  const logic = (state) => {
+    let newState = state;
+    const parsed = [];
+    for (const parser of parsers) {
+      newState = parser(newState);
+      if (newState.error) {
+        return {
+          error: `Could not parse the sequence, failed at parsing : ${parser.parses} at index: ${newState.index}`,
+        };
+      }
+      parsed.push(newState.parsed);
+    }
+
+    return { parsed };
+  };
+
+  return createParser(logic, op, { type: 'sequence', parses: `${parserList}` });
+}
 
 // ----------------------------------------------------------------
 
-parse(optionalWhitespace(), '     coolcoolcool23456');
+const coolShit = str('cool');
 
-module.exports = {
-  str,
-  regex,
-  letter,
-  letters,
-  numbers,
-  number,
-  zeroOrMore,
-  alphaNumeric,
-  alphaNumerics,
-  oneWhitespace,
-  whitespace,
-  optionalWhitespace,
-  nOrMore,
-};
+const parser = coolShit;
+
+parse(parser, 'coolshit coolshitcoolcool23456');

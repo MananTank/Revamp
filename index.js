@@ -1,27 +1,21 @@
 const run = require('./utils/run');
-const ignore = require('./utils/ignore');
-const { string, whitespace, digits } = require('./parsers/string');
-const { zeroOrMore } = require('./combinators/more');
-const debug = require('./combinators/debug');
+const { str } = require('./parsers/string');
 const seq = require('./combinators/sequence');
-const { letters } = require('./parsers/string');
+const { upTo, upToAnd } = require('./combinators/upTo');
+const string = require('./parsers/string');
 
-// string:hello
-// number:42
+console.log('uptoand is ', upToAnd);
 
-// [
-//    {
-//       type: string,
-//       value: 'hello'
-//    },
-//    {
-//       type: number,
-//       value: 42
-//    }
-// ]
+const css = `
+.selector {
+  display: flex;
+  justify-content: center;
+}`;
 
-const parser = debug(seq([letters(), digits()]));
+const selector = upToAnd(str('{')).map((s) => s.toUpperCase().trim());
 
-const tree = run(parser, 'cooladfasfdasdf123hello');
+const cssParser = seq([selector]);
 
-console.log('tree', tree);
+const tree = run(cssParser, css);
+
+console.log(tree);

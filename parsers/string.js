@@ -1,24 +1,24 @@
-const Parser = require('../classes/Parser');
-const { matchString, matchRegex } = require('../utils/matching');
+const createParser = require('../utils/createParser');
+const { matchString, matchRegex } = require('../utils/Matcher');
 
-const string = new Parser(matchString);
+const str = createParser(matchString, true);
 
-const regex = (r, map) => new Parser(matchRegex(r))(map);
+const regex = (r) => createParser(matchRegex(r));
 
-const letter = new Parser(matchRegex(/^[a-zA-Z]/));
-const letters = new Parser(matchRegex(/^[a-zA-Z]*/));
+const letter = createParser(matchRegex(/^[a-zA-Z]/));
+const letters = createParser(matchRegex(/^[a-zA-Z]*/));
 
-const digit = new Parser(matchRegex(/^[0-9]/));
-const digits = new Parser(matchRegex(/^[0-9]*/));
+const digit = createParser(matchRegex(/^[0-9]/));
+const digits = createParser(matchRegex(/^[0-9]*/));
 
-const alphaNumeric = new Parser(matchRegex(/^[a-zA-Z0-9]/));
-const alphaNumerics = new Parser(matchRegex(/^[a-zA-Z0-9]*/));
+const alphaNumeric = createParser(matchRegex(/^[a-zA-Z0-9]/));
+const alphaNumerics = createParser(matchRegex(/^[a-zA-Z0-9]*/));
 
-const singleWhitespace = new Parser(matchRegex(/^[\s]/));
-const whitespace = new Parser(matchRegex(/^[\s]*/));
+const singleWhitespace = createParser(matchRegex(/^[\s]/));
+const whitespace = createParser(matchRegex(/^[\s]*/));
 
 module.exports = {
-  string,
+  str,
   letter,
   digit,
   letters,

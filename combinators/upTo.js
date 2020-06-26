@@ -3,8 +3,9 @@ const seq = require('./sequence');
 const { updateResult, updateError } = require('../utils/state');
 
 // keep consuming till the given parser is able to parse
-function upTo(parser, map) {
-  return function upToParser(state) {
+function upTo(parser) {
+  // if (map === undefined) return null;
+  function upToParser(state, map) {
     let newState;
     let parsed = '';
     let i = 0;
@@ -38,11 +39,14 @@ function upTo(parser, map) {
 
       i += 1;
     } while (true);
-  };
+  }
+
+  return attachMap(upToParser);
 }
 
 function upToAnd(parser, map) {
-  return seq([upTo(parser), parser], (arr) => (map ? map(arr.join('')) : arr.join('')));
+  const x = seq([upTo(parser), parser], (arr) => (map ? map(arr.join('')) : arr.join('')));
+  return attachMap(x);
 }
 
 module.exports = {

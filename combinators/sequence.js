@@ -11,6 +11,7 @@ function sequence(parsers, map) {
     // n parsers produce n parsed results
     // all parsed results that should be an array
     const parsed = [];
+    let parser;
 
     let accumulatedState = state;
 

@@ -4,7 +4,7 @@
 // why make it global ? - better performance for super long input strings
 // such as parsing a 10000+ lines of code
 
-// input is only set to global while whilte the run runs
+// input is only set to global while the run runs
 // after the run completes, input is not available on global
 function run(parser, input) {
   global.input = input;

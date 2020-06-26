@@ -1,32 +1,8 @@
+/* eslint-disable no-shadow */
 /* eslint-disable no-console */
 /* eslint-disable strict */
 
 'use strict';
-
-// a parser when sees a state that already has error, does not do anything and returns as it is
-// so the state bubbles up to the end
-
-/* eslint-disable no-shadow */
-// const color = (c) => {
-//   const reset = '\x1b[0m';
-//   return {
-//     yellow: `\x1b[33m%s${reset}`,
-//     red: `\x1b[31m${reset}`,
-//     blue: 'blue',
-//   }[c];
-// };
-
-// const handleError = (fn) => (s, op) => {
-//   if (!s) {
-//     console.log('-----------------------------------------------');
-//     console.error(`ERROR: ${fn.name}() called without first argument !`);
-//     console.log('------------------------------------------------');
-//     return null;
-//   }
-//   return fn(s, op);
-// };
-
-// const string = handleError(str);
 
 const parse = (parser, input) => {
   global.input = input;
@@ -45,7 +21,7 @@ const parser = (logic, options = {}) => (state) => {
   if (state.error) return state;
   const { error, parsed } = logic(state.index);
 
-  if (parsed) {
+  if (!error) {
     const newState = Object.freeze({
       ...state,
       parsed: options.revamp ? options.revamp(parsed) : parsed,
@@ -70,20 +46,24 @@ const str = (s, op) => {
   return strParser;
 };
 
-// REGEX: ---------------
+// REGEX -----------------------------------------
 const regex = (r, op) => parser((i) => {
   const result = global.input.slice(i).match(r);
-  if (result && result[0]) return { parsed: result[0] };
+  if (result) return { parsed: result[0] };
   return { error: `can not match regex at -> "${global.input.slice(i, i + 10)}..."` };
 }, op);
 
-// regex based parsers
 const letters = (op) => regex(/^[a-z]+/, op);
 const letter = (op) => regex(/^[a-z]/, op);
 const number = (op = {}) => regex(/^[0-9]/, op);
 const numbers = (op = {}) => regex(/^[0-9]+/, op);
+const alphaNumeric = (op = {}) => regex(/^[a-zA-Z0-9]/, op);
+const alphaNumerics = (op = {}) => regex(/^[a-zA-Z0-9]+/, op);
+const oneWhitespace = (op = {}) => regex(/^[\s]/, op);
+const whitespace = (op = {}) => regex(/^[\s]+/, op);
+const optionalWhitespace = (op = {}) => regex(/^[\s]*/, op);
 
-// x or more times
+// MORE ------------------------------
 const zeroOrMore = (parser, op = {}) => (state) => {
   if (state.error) return state;
   let newState = state;
@@ -120,7 +100,9 @@ const nOrMore = (n, parser, op = {}) => (state) => {
   }
 };
 
-parse(nOrMore(4, str('cool')), 'coolcoolcool23456');
+// ----------------------------------------------------------------
+
+parse(optionalWhitespace(), '     coolcoolcool23456');
 
 module.exports = {
   str,
@@ -129,4 +111,11 @@ module.exports = {
   letters,
   numbers,
   number,
+  zeroOrMore,
+  alphaNumeric,
+  alphaNumerics,
+  oneWhitespace,
+  whitespace,
+  optionalWhitespace,
+  nOrMore,
 };

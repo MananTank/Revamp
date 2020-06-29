@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 const createParser = require('./createParser');
 
 // run parser op.min or more times
@@ -19,10 +20,11 @@ function many(parser, op = {}) {
         if (i >= op.min) return { ...newState, parsed: parsedArray, error: null };
 
         // ❌ else error
-        return {
-          ...newState,
-          error: `expected ${parser.type} parser to to parse ${parser.target} ${op.min} or more times, but parsed ${i} times instead`,
-        };
+        return newState;
+        // return {
+        //   ...newState,
+        //   error: `expected ${parser.type} parser to to parse ${parser.target} ${op.min} or more times, but parsed ${i} times instead`,
+        // };
       }
 
       // if no error, push it parsed array
@@ -83,6 +85,14 @@ function upTo(parser, op) {
   return createParser(logic, op, { type: 'upTo', parses: parser.parses });
 }
 
+function upToAnd(parser, op) {
+  return seq({
+    parsers: [upTo(parser), parser],
+    revamp: (arr) => (op ? op(arr[0]) : arr[0]),
+  });
+}
+
+// ----------------------------------------------
 function seq(op) {
   const parserList = op.parsers.map((p) => p.parses).join(',');
   const logic = (state) => {
@@ -94,7 +104,7 @@ function seq(op) {
 
       // ❌ return the error state of parser that failed
       if (newState.error) {
-        return { ...newState, error: `ERROR in seq : ${newState.error}` };
+        return newState;
       }
       parsedArray.push(newState.parsed);
     }
@@ -106,9 +116,44 @@ function seq(op) {
   return createParser(logic, op, { type: 'seq', parses: `${parserList}` });
 }
 
+// parse anything in between op.left and op.right
+function inBetween(op) {
+  function logic(state) {
+    // parse left
+    const leftState = op.left(state);
+    if (leftState.error) return leftState;
+
+    // try and satisfy the right parser
+
+    let parsed = '';
+
+    let i = leftState.index;
+    while (i < global.input.length) {
+      const rightState = op.right({ ...state, index: i });
+      if (!rightState.error) {
+        return { ...rightState, parsed, error: null };
+      }
+
+      parsed += global.input[i++];
+    }
+
+    return {
+      ...state,
+      error: 'ERROR: in inBetween : End of input reached, but can not satisfy given parsers',
+    };
+  }
+
+  return createParser(logic, op, {
+    type: 'inBetween',
+    parses: `left: ${op.left}, right: ${op.right}`,
+  });
+}
+
 module.exports = {
   seq,
   many,
   oneOf,
   upTo,
+  inBetween,
+  upToAnd,
 };

@@ -11,7 +11,7 @@ function createParser(logic, op = {}, info = { type: 'NA', parses: 'NA' }) {
     // if index is beyond input's length
     if (state.index > global.input.length - 1) {
       // ✔️ if the parser is optional no error
-      if (op.optional) return { ...state, parsed: '' };
+      if (op.optional) return { ...state, parsed: null };
       // ❌ else, EOI error
       return { ...state, error: 'end of input reached' };
     }
@@ -28,6 +28,11 @@ function createParser(logic, op = {}, info = { type: 'NA', parses: 'NA' }) {
         index,
       });
 
+      // see what happens after the parser parses the given parser
+      if (op.lookAhead) {
+        op.lookAhead(newState, op);
+      }
+
       // log when debug mode is on
       debug(newState, info);
 
@@ -37,8 +42,14 @@ function createParser(logic, op = {}, info = { type: 'NA', parses: 'NA' }) {
       return nextParser ? nextParser(newState) : newState;
     }
 
+    // see what happens after the parser parses the given parser
+    if (op.lookAhead) {
+      op.lookAhead({ ...state, error }, op);
+    }
+    console.log('op is', op);
+
     // ✔️ if parser could not parser but was optional, no error
-    if (op.optional) return { ...state, parsed: '' };
+    if (op.optional) return { ...state, parsed: null };
 
     // ❌ parsing error
     return Object.freeze({ ...state, error });

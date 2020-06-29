@@ -1,19 +1,7 @@
 /* eslint-disable no-use-before-define */
-const util = require('util');
 const {
-  str, parse, many, seq, lazy, numbers, oneOf, whitespace,
-} = require('./index');
-
-// numbers array that can have other numbers array
-// valid :
-// [1]
-// [1,2, [1,2,3]]
-// [1, [1,2 , [4,5,6]]]
-
-// invalid:
-// []  <- empty
-// [1 [1,3 ]]  <- missing comma
-// [2 [4 6 ] <- missing matching brackets
+  str, many, seq, lazy, numbers, oneOf, whitespace,
+} = require('../index');
 
 const optionalSpace = whitespace({
   optional: true,
@@ -41,12 +29,15 @@ const numbersArray = seq({
   revamp: (arr) => arr[1],
 });
 
-const ast = parse({
-  parser: numbersArray,
-  input: '[1, 2,   3, 44, [10, 30, 500, [500, 500, 300] ] ]',
-  // debugMode: true,
-});
+module.exports = numbersArray;
 
-console.log(ast);
+// numbers array that can have other numbers array
+// valid :
+// [1]
+// [1,2, [1,2,3]]
+// [1, [1,2 , [4,5,6]]]
 
-// console.log(util.inspect(ast, { showHidden: false, depth: null }));
+// invalid:
+// []  <- empty
+// [1 [1,3 ]]  <- missing comma
+// [2 [4 6 ] <- missing matching brackets

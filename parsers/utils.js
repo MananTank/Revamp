@@ -2,10 +2,13 @@ const createParser = require('./createParser');
 
 // parse starts the parsing by calling the outermost parser with initial state
 // input and other settings are saved in global
-function parse({ parser, input, debugMode }) {
+function parse({
+  parser, input, debugMode, stepper,
+}) {
   // set
   global.input = input;
   global.debugMode = debugMode;
+  global.stepper = stepper;
 
   const initialState = {
     index: 0,
@@ -18,6 +21,7 @@ function parse({ parser, input, debugMode }) {
   // reset
   global.debugMode = null;
   global.input = null;
+  global.stepper = null;
   return endState;
 }
 

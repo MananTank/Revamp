@@ -12,8 +12,28 @@ function str(s, op) {
       parsed += inputChar;
 
       // fail ❌
+      if (i + index > global.input.length - 1) {
+        return {
+          ...state,
+          error: {
+            type: 'unexpected end of input',
+            parser: 'str',
+          },
+        };
+      }
+
+      // fail ❌
       if (inputChar !== s[i]) {
-        return { error: `expected "${s}", got "${parsed}" instead at index: ${index + i}` };
+        return {
+          ...state,
+          error: {
+            type: 'unexpected character',
+            expected: s[i],
+            got: inputChar,
+            index: index + i,
+            parser: 'str',
+          },
+        };
       }
     }
 
@@ -37,15 +57,21 @@ function regex(rExp, op, parses) {
     // fail ❌
     return {
       ...state,
-      error: `can not match regex at -> "${global.input.slice(index, index + 10)}..."`,
+      error: {
+        type: 'regex',
+        parser: 'regex',
+        expected: rExp,
+        got: `${global.input.slice(index, index + 10)}...`,
+        index: 0,
+      },
     };
   };
 
   return createParser(logic, op, { type: 'regex()', parses });
 }
 
-const letters = (op) => regex(/^[a-z]+/, op, 'letters');
-const letter = (op) => regex(/^[a-z]/, op, 'letter');
+const letters = (op) => regex(/^[a-zA-Z]+/, op, 'letters');
+const letter = (op) => regex(/^[a-zA-Z]/, op, 'letter');
 const number = (op) => regex(/^[0-9]/, op, 'number');
 const numbers = (op) => regex(/^[0-9]+/, op, 'numbers');
 const alphaNumeric = (op) => regex(/^[a-zA-Z0-9]/, op, 'alpha numeric');

@@ -61,7 +61,7 @@ function regex(rExp, op, parses) {
       error: {
         type: 'regex',
         parser: 'regex',
-        expected: rExp,
+        expected: parses,
         got: `${global.input.slice(index, index + 10)}...`,
         index: 0,
       },

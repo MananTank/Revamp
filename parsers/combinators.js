@@ -49,15 +49,23 @@ function oneOf(op) {
 
   const logic = (state) => {
     let newState = state;
+    const errors = [];
 
     for (const parser of op.parsers) {
       newState = parser(state);
       // ✔️
       if (!newState.error) return newState;
+      errors.push(newState.error);
     }
 
-    // ❌
-    return { ...state, error: `none of [${parserList}] in oneOf parser could parse` };
+    // ❌, if none of the parsers could parse
+    return {
+      ...state,
+      error: {
+        type: 'all the parsers failed given to oneOf()',
+        errors,
+      },
+    };
   };
 
   return createParser(logic, op, {

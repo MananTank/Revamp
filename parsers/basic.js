@@ -32,6 +32,7 @@ function str(s, op) {
             got: inputChar,
             index: index + i,
             parser: 'str',
+            parsing: s,
           },
         };
       }

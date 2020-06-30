@@ -20,11 +20,17 @@ function many(parser, op = {}) {
         if (i >= op.min) return { ...newState, parsed: parsedArray, error: null };
 
         // ❌ else error
-        return newState;
-        // return {
-        //   ...newState,
-        //   error: `expected ${parser.type} parser to to parse ${parser.target} ${op.min} or more times, but parsed ${i} times instead`,
-        // };
+        return {
+          ...newState,
+          parsed: parsedArray,
+          error: {
+            ...newState.error,
+            many: {
+              min: op.min,
+              executed: i,
+            },
+          },
+        };
       }
 
       // if no error, push it parsed array
@@ -94,24 +100,25 @@ function upToAnd(parser, op) {
 
 // ----------------------------------------------
 function seq(op) {
+  // for debug mode
   const parserList = op.parsers.map((p) => p.parses).join(',');
-  const logic = (state) => {
+
+  // keep parsing parsers till an error is encountered
+  // return last state, with parsed value changed to array of parsed values
+  function logic(state) {
     let newState = state;
     const parsedArray = [];
 
     for (const parser of op.parsers) {
       newState = parser(newState);
-
-      // ❌ return the error state of parser that failed
-      if (newState.error) {
-        return newState;
-      }
+      // ❌ stop parsing further
+      if (newState.error) break;
       parsedArray.push(newState.parsed);
     }
 
-    // ✔️ replace last parser's parsed value to parsed array
+    // ✔️, ❌ return last parser's state, but change the parsed value to parsed array
     return { ...newState, parsed: parsedArray };
-  };
+  }
 
   return createParser(logic, op, { type: 'seq', parses: `${parserList}` });
 }

@@ -17,42 +17,37 @@ function createParser(logic, op = {}, info = { type: 'NA', parses: 'NA' }) {
     }
 
     // apply logic, get new state
-    const { error, parsed, index } = logic(state);
+    const newState = logic(state);
+    const { error, parsed, index } = newState;
 
     // if no error in new state
     if (!error) {
       // apply revamp if any
-      const newState = Object.freeze({
-        ...state,
+
+      const revampedNewState = {
+        ...newState,
         parsed: op.revamp ? op.revamp(parsed) : parsed,
-        index,
-      });
+      };
 
       // see what happens after the parser parses the given parser
-      if (op.lookAhead) {
-        op.lookAhead(newState, op);
-      }
+      // if (op.lookAhead) {
+      //   op.lookAhead(newState, op);
+      // }
 
       // log when debug mode is on
-      debug(newState, info);
+      debug(revampedNewState, info);
 
       // ✔️ return new state
       // or run next parser and then return, it's new state
-      const nextParser = op.next && op.next(newState.parsed);
-      return nextParser ? nextParser(newState) : newState;
+      const nextParser = op.next && op.next(revampedNewState.parsed);
+      return nextParser ? nextParser(revampedNewState) : revampedNewState;
     }
-
-    // see what happens after the parser parses the given parser
-    if (op.lookAhead) {
-      op.lookAhead({ ...state, error }, op);
-    }
-    console.log('op is', op);
 
     // ✔️ if parser could not parser but was optional, no error
-    if (op.optional) return { ...state, parsed: null };
+    if (op.optional) return { ...newState, error: null };
 
     // ❌ parsing error
-    return Object.freeze({ ...state, error });
+    return newState;
   }
 
   // apply info to parser for better dev experience

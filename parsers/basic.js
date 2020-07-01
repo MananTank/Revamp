@@ -65,8 +65,9 @@ function regex(rExp, op, parses) {
   const logic = (state) => {
     const { index } = state;
     const result = global.input.slice(index).match(safeRegExp);
+
     // pass ✔️
-    if (result) return { ...state, parsed: result[0], index: index + result[0].length };
+    if (result && result[0]) return { ...state, parsed: result[0], index: index + result[0].length };
     // fail ❌
     return {
       ...state,
@@ -89,11 +90,11 @@ const number = (op) => regex(/^[0-9]/, op, 'number');
 const numbers = (op) => regex(/^[0-9]+/, op, 'numbers');
 const alphaNumeric = (op) => regex(/^[a-zA-Z0-9]/, op, 'alpha numeric');
 const alphaNumerics = (op) => regex(/^[a-zA-Z0-9]+/, op, 'alpha numerics');
-const singleWhitespace = (op) => regex(/^[\s]/, op, 'one whitespace');
+const singleWhitespace = (op) => regex(/^\s/, op, 'singleWhitespace');
 
 // default 1 or more
 // use op.min to set to x or more
-const whitespace = (op) => many(singleWhitespace(), op);
+const whitespace = (op) => regex(/^\s+/, op, 'whitespace');
 
 module.exports = {
   str,

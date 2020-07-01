@@ -84,7 +84,7 @@ function upTo(parser, op) {
     while (i < global.input.length) {
       newState = parser({ ...state, index: i });
       // ✔️
-      if (!newState.error) return { ...state, parsed, index: parsed.length };
+      if (!newState.error) return { ...state, parsed, index: state.index + parsed.length };
       parsed += global.input[i];
       i++;
     }
@@ -140,21 +140,32 @@ function inBetween(op) {
 
     // try and satisfy the right parser
 
-    let parsed = '';
+    let between = '';
 
     let i = leftState.index;
     while (i < global.input.length) {
       const rightState = op.right({ ...state, index: i });
       if (!rightState.error) {
-        return { ...rightState, parsed, error: null };
+        return {
+          ...rightState,
+          parsed: {
+            left: leftState.parsed,
+            between,
+            right: rightState.parsed,
+          },
+          error: null,
+        };
       }
 
-      parsed += global.input[i++];
+      between += global.input[i++];
     }
 
     return {
       ...state,
       error: 'ERROR: in inBetween : End of input reached, but can not satisfy given parsers',
+      parsed: {
+        left: leftState.parsed,
+      },
     };
   }
 

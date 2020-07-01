@@ -35,7 +35,7 @@ function createParser(logic, op = {}, info = { type: 'NA', parses: 'NA' }) {
       // }
 
       // log when debug mode is on
-      debug(revampedNewState, info);
+      debug(revampedNewState, info, op);
 
       // ✔️ return new state
       // or run next parser and then return, it's new state
@@ -43,8 +43,8 @@ function createParser(logic, op = {}, info = { type: 'NA', parses: 'NA' }) {
       return nextParser ? nextParser(revampedNewState) : revampedNewState;
     }
 
-    // ✔️ if parser could not parser but was optional, no error
-    if (op.optional) return { ...newState, error: null };
+    // ✔️ could not parse, but was optional, return the parser null
+    if (op.optional) return { ...state, parsed: null };
 
     // ❌ parsing error
     return newState;
@@ -57,8 +57,8 @@ function createParser(logic, op = {}, info = { type: 'NA', parses: 'NA' }) {
   return parser;
 }
 
-function debug(state, info) {
-  if (global.debugMode) {
+function debug(state, info, op) {
+  if (global.debugMode || (op && op.debug)) {
     console.log(info.type, '|', info.parses);
     console.log(state);
     console.log('\n');

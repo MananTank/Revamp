@@ -1,9 +1,9 @@
+const util = require('util');
 const createParser = require('./createParser');
-
 // parse starts the parsing by calling the outermost parser with initial state
 // input and other settings are saved in global
 function parse({
-  parser, input, debugMode, stepper,
+  parser, input, debugMode, stepper, log,
 }) {
   // set
   global.input = input;
@@ -17,6 +17,10 @@ function parse({
   };
 
   const endState = parser(initialState);
+
+  if (log) {
+    console.log(util.inspect(endState, false, null, true /* enable colors */));
+  }
 
   // reset
   global.debugMode = null;

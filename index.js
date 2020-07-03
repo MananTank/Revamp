@@ -1,11 +1,31 @@
-const createParser = require('./parsers/createParser');
-const combinators = require('./parsers/combinators');
-const basic = require('./parsers/basic');
-const utils = require('./parsers/utils');
+// combinators
+const inBetween = require('./revamp/combinators/inBetween');
+const many = require('./revamp/combinators/many');
+const oneOf = require('./revamp/combinators/oneOf');
+const seq = require('./revamp/combinators/seq');
+const { upTo, upToAnd } = require('./revamp/combinators/upTo');
+
+// parsers
+const str = require('./revamp/parsers/str');
+const regex = require('./revamp/parsers/regex');
+const others = require('./revamp/parsers/others');
+
+// utils
+const lazy = require('./revamp/utils/lazy');
+const parse = require('./revamp/utils/parse');
+const createParser = require('./revamp/utils/createParser');
 
 module.exports = {
   createParser,
-  ...combinators,
-  ...basic,
-  ...utils,
+  str,
+  regex,
+  ...others,
+  lazy,
+  parse,
+  inBetween,
+  many,
+  oneOf,
+  upTo,
+  upToAnd,
+  seq,
 };

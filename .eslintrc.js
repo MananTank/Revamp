@@ -19,6 +19,6 @@ module.exports = {
     'no-extra-parens': 1,
     'consistent-return': 0,
     'no-plusplus': 0,
-    // 'prefer-const': 0,
+    'no-console': 0,
   },
 };

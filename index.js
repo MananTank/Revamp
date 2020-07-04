@@ -2,6 +2,7 @@
 const inBetween = require('./revamp/combinators/inBetween');
 const many = require('./revamp/combinators/many');
 const oneOf = require('./revamp/combinators/oneOf');
+const or = require('./revamp/combinators/or');
 const seq = require('./revamp/combinators/seq');
 const { upTo, upToAnd } = require('./revamp/combinators/upTo');
 
@@ -28,4 +29,5 @@ module.exports = {
   upTo,
   upToAnd,
   seq,
+  or,
 };

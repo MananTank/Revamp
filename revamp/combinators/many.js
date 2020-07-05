@@ -21,6 +21,7 @@ function many(parser, op = {}) {
       }
 
       // if parser parsed something, even if it has error, push it
+      // this is done so that all the parsed stuff does not go to waste and user can see how much is parsed and where the parsing stopped
       if (newState.parsed) {
         parsedArray[i++] = newState.parsed;
       }

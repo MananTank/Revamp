@@ -63,7 +63,7 @@ function createParser(logic, op = {}, info = { type: 'NA', parses: 'NA' }) {
 }
 
 function debug(state, info, op) {
-  if (global.debugMode || (op && op.log)) {
+  if ((!op.nolog && global.debugMode) || (op && op.log)) {
     console.log('\n\n');
     console.log(info.type, ':', info.parses);
     console.log('--------------------------------');

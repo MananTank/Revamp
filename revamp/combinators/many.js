@@ -10,10 +10,12 @@ function many(parser, op = {}) {
     let i = 0; // parser ran i times
 
     while (true) {
+      // parse the ith parser
       newState = parser(newState);
 
-      if (op.seperator) {
-        const { index, error } = op.seperator(newState);
+      // if ith parser passes, try and parser sep
+      if (!newState.error && op.sep) {
+        const { index, error } = op.sep(newState);
         newState.index = index;
         newState.error = error;
       }
@@ -28,7 +30,7 @@ function many(parser, op = {}) {
         // ✔️ stop parsing, no error
         // if parsed more than min and no strict errors
         if (i >= op.min && !newState.strictError) {
-          return { ...newState, parsed: parsedArray, error: null };
+          return { ...newState, parsed: parsedArray, error: null }; // last sep error or parser error is ignored
         }
 
         // ❌ else error

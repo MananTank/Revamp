@@ -22,17 +22,16 @@ function regex(rExp, op, parses) {
     // fail ❌
     return {
       ...state,
+      parsed: null,
       error: {
-        type: 'regex',
-        parser: 'regex',
         expected: parses,
-        got: `${global.input.slice(index, index + 10)}...`,
-        index: 0,
+        got: global.input[index],
+        type: 'regex',
       },
     };
   };
 
-  return createParser(logic, op, { type: 'regex()', parses });
+  return createParser(logic, op, { type: 'REGEX', parses });
 }
 
 module.exports = regex;

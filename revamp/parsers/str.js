@@ -48,7 +48,7 @@ function str(s, op) {
     };
   }
 
-  return createParser(logic, op, { type: 'basic', parses: `"${s}"` });
+  return createParser(logic, op, { type: 'STRING', parses: s });
 }
 
 module.exports = str;

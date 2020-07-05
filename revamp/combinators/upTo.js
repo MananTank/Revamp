@@ -1,5 +1,5 @@
 const createParser = require('../utils/createParser');
-const seq = require('./seq');
+const seq = require('./series');
 
 function upTo(op) {
   const logic = (state) => {

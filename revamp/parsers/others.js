@@ -11,7 +11,6 @@ const alphaNumerics = (op) => regex(/^[a-zA-Z0-9]+/, op, 'alpha numerics');
 
 const singleWhitespace = (op) => regex(/^\s/, op, 'singleWhitespace');
 const whitespace = (op) => regex(/^\s+/, op, 'whitespace');
-const optionalWhitespace = (op) => regex(/^\s+/, op, 'whitespace');
 
 module.exports = {
   letter,
@@ -22,5 +21,4 @@ module.exports = {
   alphaNumerics,
   singleWhitespace,
   whitespace,
-  optionalWhitespace,
 };

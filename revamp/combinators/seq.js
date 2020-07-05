@@ -16,8 +16,11 @@ function seq(parsersObj, op = {}) {
       newState = parser(newState);
       // ❌ stop parsing further
       // do not send half parsed seq
-      if (newState.error) return { ...newState, parsed: null };
-      parsedObj[key] = newState.parsed;
+      if (newState.error) break;
+
+      if (key[0] !== '_') {
+        parsedObj[key] = newState.parsed;
+      }
     }
 
     // ✔️, ❌ return last parser's state, but change the parsed value to parsed array

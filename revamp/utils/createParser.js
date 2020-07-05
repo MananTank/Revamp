@@ -24,8 +24,6 @@ function createParser(logic, op = {}, info = { type: 'NA', parses: 'NA' }) {
       op.modify({ state: newState, op });
     }
 
-    debug(newState, info, op);
-
     // ✔️ if no error in new state
     if (!newState.error) {
       const revampedNewState = {
@@ -55,15 +53,24 @@ function createParser(logic, op = {}, info = { type: 'NA', parses: 'NA' }) {
   parser.type = info.type;
   parser.parses = info.parses;
 
-  return parser;
+  // return parser;
+  // extra wrapper for debugging
+  return (state) => {
+    const newState = parser(state);
+    debug(newState, info, op);
+    return newState;
+  };
 }
 
 function debug(state, info, op) {
-  if (global.debugMode || (op && op.debug)) {
-    console.log(info.type, '|', info.parses);
+  if (global.debugMode || (op && op.log)) {
+    console.log('\n\n');
+    console.log(info.type, ':', info.parses);
+    console.log('--------------------------------');
     console.log(state);
-    console.log('op: ', op);
-    console.log('------------------------------------\n');
+    if (op.strict) {
+      console.log('(STRICT)');
+    }
   }
 }
 

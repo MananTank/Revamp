@@ -12,6 +12,12 @@ function many(parser, op = {}) {
     while (true) {
       newState = parser(newState);
 
+      if (op.seperator) {
+        const { index, error } = op.seperator(newState);
+        newState.index = index;
+        newState.error = error;
+      }
+
       // if parser parsed something, even if it has error, push it
       if (newState.parsed) {
         parsedArray[i++] = newState.parsed;
@@ -31,7 +37,7 @@ function many(parser, op = {}) {
     }
   }
 
-  return createParser(logic, op, { type: `many {min:${op.min}}`, parses: parser.parses });
+  return createParser(logic, op, { type: 'MANY', parses: parser.parses });
 }
 
 module.exports = many;

@@ -1,10 +1,10 @@
 /* eslint-disable guard-for-in */
 const createParser = require('../utils/createParser');
 
-// a strict seq throws strictError when it is not fully satisfied
+// a strict series throws strictError when it is not fully satisfied
 // if not even the first parser is satisfied, then no criticle error is thrown, only simple error
 
-function seq(parsersObj, op = {}) {
+function series(parsersObj, op = {}) {
   const totalParsers = Object.keys(parsersObj).length;
 
   function logic(state) {
@@ -14,26 +14,31 @@ function seq(parsersObj, op = {}) {
     for (const key in parsersObj) {
       const parser = parsersObj[key];
       newState = parser(newState);
-      // ❌ stop parsing further
-      // do not send half parsed seq
+
+      // if a parser fails in series, stop parsing further
       if (newState.error) break;
 
+      // else, push the parsed into obj
       if (key[0] !== '_') {
         parsedObj[key] = newState.parsed;
       }
     }
 
-    // ✔️, ❌ return last parser's state, but change the parsed value to parsed array
-
     const parsedParsers = Object.keys(parsersObj).length;
     // if some parsed but not all
+    // and if series is strict
+    // send error, nothnig parsed
     if (op.strict && parsedParsers > 0 && totalParsers !== parsedParsers) {
-      return { ...newState, strictError: true, parsed: parsersObj };
+      return { ...newState, strictError: true, parsed: null };
     }
+
+    // else
+    // if all passed, return last parser's state with parsed value of parsedObj
+    // if not all parsed, return last parser's state, with parsed value as parsedObj
     return { ...newState, parsed: parsedObj };
   }
 
-  return createParser(logic, op, { type: 'seq', parses: parsersObj });
+  return createParser(logic, op, { type: 'SERIES', parses: Object.keys(parsersObj) });
 }
 
-module.exports = seq;
+module.exports = series;

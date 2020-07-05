@@ -11,13 +11,15 @@ function parse(op) {
   global.debugMode = debugMode;
 
   const initialState = {
-    index: 0,
     parsed: null,
     error: null,
+    index: 0,
   };
 
+  console.log('===============================================================\n\n');
   const endState = parser(initialState);
 
+  console.log('===============================================================\n\n');
   if (log) {
     console.log(util.inspect(endState, false, null, true /* enable colors */));
   }

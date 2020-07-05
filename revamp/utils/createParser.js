@@ -18,16 +18,20 @@ function createParser(logic, op = {}, info = { type: 'NA', parses: 'NA' }) {
 
     // apply logic, get new state
     const newState = logic(state);
-    const { error, parsed } = newState;
+
+    // after this state and op is modified
+    if (op.modify) {
+      op.modify({ state: newState, op });
+    }
+
+    debug(newState, info, op);
 
     // ✔️ if no error in new state
-    if (!error) {
+    if (!newState.error) {
       const revampedNewState = {
         ...newState,
-        parsed: op.revamp ? op.revamp(parsed) : parsed,
+        parsed: op.revamp ? op.revamp(newState.parsed) : newState.parsed,
       };
-
-      debug(revampedNewState, info, op);
 
       // ✔️ return new state
       // or run next parser and then return, it's new state
@@ -58,6 +62,7 @@ function debug(state, info, op) {
   if (global.debugMode || (op && op.debug)) {
     console.log(info.type, '|', info.parses);
     console.log(state);
+    console.log('op: ', op);
     console.log('------------------------------------\n');
   }
 }

@@ -1,6 +1,6 @@
 const createParser = require('../utils/createParser');
 
-function many(op) {
+function many(parser, op = {}) {
   // default min: 1
   op.min = op.min ? op.min : 1;
 
@@ -10,7 +10,7 @@ function many(op) {
     let i = 0; // parser ran i times
 
     while (true) {
-      newState = op.parser(newState);
+      newState = parser(newState);
 
       // if parser parsed something, even if it has error, push it
       if (newState.parsed) {
@@ -31,7 +31,7 @@ function many(op) {
     }
   }
 
-  return createParser(logic, op, { type: `many {min:${op.min}}`, parses: op.parser.parses });
+  return createParser(logic, op, { type: `many {min:${op.min}}`, parses: parser.parses });
 }
 
 module.exports = many;

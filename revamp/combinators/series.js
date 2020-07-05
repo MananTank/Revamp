@@ -10,13 +10,22 @@ function series(parsersObj, op = {}) {
   function logic(state) {
     let newState = state;
     const parsedObj = {};
+    let i = 0;
 
     for (const key in parsersObj) {
       const parser = parsersObj[key];
       newState = parser(newState);
+      i++;
 
       // if a parser fails in series, stop parsing further
       if (newState.error) break;
+
+      // if no error, parse sep if any and not after the last item
+      if (op.sep && i !== totalParsers) {
+        const { error, index } = op.sep(newState);
+        newState.index = index;
+        newState.error = error;
+      }
 
       // else, push the parsed into obj
       if (key[0] !== '_') {

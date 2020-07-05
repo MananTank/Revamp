@@ -16,10 +16,14 @@ function parse(op) {
     index: 0,
   };
 
-  console.log('===============================================================\n\n');
+  if (debugMode) {
+    console.log('===============================================================\n\n');
+  }
   const endState = parser(initialState);
 
-  console.log('===============================================================\n\n');
+  if (debugMode) {
+    console.log('===============================================================\n\n');
+  }
   if (log) {
     console.log(util.inspect(endState, false, null, true /* enable colors */));
   }

@@ -2,9 +2,10 @@ const util = require('util');
 
 // parse starts the parsing by calling the outermost parser with initial state
 // input and other settings are saved in global
-function parse({
-  parser, input, debugMode, log,
-}) {
+function parse(op) {
+  const {
+    parser, input, debugMode, log,
+  } = op;
   // set
   global.input = input;
   global.debugMode = debugMode;

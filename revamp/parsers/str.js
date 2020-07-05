@@ -14,9 +14,11 @@ function str(s, op) {
       if (i + index > global.input.length - 1) {
         return {
           ...state,
+          parsed: null,
           error: {
             type: 'unexpected end of input',
             parser: 'str',
+            index: i,
           },
         };
       }
@@ -25,6 +27,7 @@ function str(s, op) {
       if (inputChar !== s[i]) {
         return {
           ...state,
+          parsed: null,
           error: {
             type: 'unexpected character',
             expected: s[i],

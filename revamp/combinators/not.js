@@ -1,14 +1,14 @@
 const createParser = require('../utils/createParser');
 
 // parse till given parser throws error
-function not(op) {
+function not(parser, op) {
   const logic = (state) => {
     let i = state.index;
     let newState = state;
     let parsed = '';
 
     while (i < global.input.length) {
-      newState = op.parser({ ...state, index: i });
+      newState = parser({ ...state, index: i });
       if (!newState.error) break;
       parsed += global.input[i];
       i++;
@@ -20,7 +20,7 @@ function not(op) {
     return { ...state, error: 'not parser failed' };
   };
 
-  return createParser(logic, op, { type: 'upTo', parses: op.parser.parses });
+  return createParser(logic, op, { type: 'upTo', parses: parser.parses });
 }
 
 module.exports = not;

@@ -1,11 +1,11 @@
 const createParser = require('../utils/createParser');
 
-function str(s, op) {
+function string(s, op) {
   function logic(state) {
     const { index } = state;
     let parsed = ''; // keep track of what parsed
 
-    // match characters of input from index to string s
+    // match characters of input from index to stringing s
     for (let i = 0; i < s.length; i++) {
       const inputChar = global.input[index + i];
       parsed += inputChar;
@@ -17,7 +17,7 @@ function str(s, op) {
           parsed: null,
           error: {
             type: 'unexpected end of input',
-            parser: 'str',
+            parser: 'string',
             index: i,
           },
         };
@@ -33,7 +33,7 @@ function str(s, op) {
             expected: s[i],
             got: inputChar,
             index: index + i,
-            parser: 'str',
+            parser: 'string',
             parsing: s,
           },
         };
@@ -51,4 +51,4 @@ function str(s, op) {
   return createParser(logic, op, { type: 'STRING', parses: s });
 }
 
-module.exports = str;
+module.exports = string;

@@ -8,7 +8,7 @@ const not = require('./revamp/combinators/not');
 const { upTo, upToAnd } = require('./revamp/combinators/upTo');
 
 // parsers
-const str = require('./revamp/parsers/str');
+const string = require('./revamp/parsers/string');
 const regex = require('./revamp/parsers/regex');
 const others = require('./revamp/parsers/others');
 
@@ -19,7 +19,7 @@ const createParser = require('./revamp/utils/createParser');
 
 module.exports = {
   createParser,
-  str,
+  string,
   regex,
   ...others,
   lazy,

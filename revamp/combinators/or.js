@@ -1,26 +1,27 @@
 const createParser = require('../utils/createParser');
 
 // keep parsing till one of the parser is matching
-function or(op) {
-  const parserList = op.parsers.map((p) => p.parses).join(', ');
-
+function or(parsersObj, op) {
+  const keys = Object.keys(parsersObj);
   const logic = (state) => {
     let newState = state;
-    const totalParsers = op.parsers.length;
+    const totalParsers = keys.length;
     let tempState;
-    const parsed = [];
-    let errors = []; // if no parser of or can pass anything, this will be all the errors
+    let parsed = '';
+    let errors = {}; // if no parser of or can pass anything, this will be all the errors
 
     let i = 0;
     while (i < totalParsers) {
-      tempState = op.parsers[i++](newState);
+      const parser = parsersObj[keys[i]];
+      tempState = parser(newState);
       if (!tempState.error) {
         i = 0;
         newState = tempState;
-        parsed.push(newState.parsed);
-        errors = [];
+        parsed += newState.parsed;
+        errors = {};
       } else {
-        errors.push(tempState.error);
+        errors[keys[i]] = tempState.error;
+        i++;
       }
     }
     if (parsed.length) {
@@ -31,7 +32,7 @@ function or(op) {
 
   return createParser(logic, op, {
     type: 'or',
-    parses: `[${parserList}]`,
+    parses: keys,
   });
 }
 

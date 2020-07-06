@@ -13,7 +13,12 @@ function createParser(logic, op = {}, info = { type: 'NA', parses: 'NA' }) {
       // ✔️ if the parser is optional no error
       if (op.optional) return { ...state, parsed: null };
       // ❌ else, EOI error
-      return { ...state, error: 'end of input reached' };
+      return {
+        ...state,
+        error: {
+          type: 'end of input reached',
+        },
+      };
     }
 
     // apply logic, get new state

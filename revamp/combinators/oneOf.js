@@ -1,24 +1,26 @@
+/* eslint-disable guard-for-in */
 const createParser = require('../utils/createParser');
 
-function oneOf(op) {
-  const parserList = op.parsers.map((p) => p.parses).join(', ');
+function oneOf(parsersObj, op) {
+  // const parserList = parsersObj.map((p) => p.parses).join(', ');
 
   const logic = (state) => {
     let newState = state;
-    const errors = [];
+    const errors = {};
 
-    for (const parser of op.parsers) {
+    for (const key in parsersObj) {
+      const parser = parsersObj[key];
       newState = parser(state);
       // ✔️
       if (!newState.error) return newState;
-      errors.push(newState.error);
+      errors[key] = newState.error;
     }
 
-    // ❌, if none of the parsers could parse
+    // ❌, if none of the parsersObj could parse
     return {
       ...state,
       error: {
-        type: 'all the parsers failed given to oneOf()',
+        type: 'all the parsersObj failed given to oneOf()',
         errors,
       },
     };
@@ -26,7 +28,7 @@ function oneOf(op) {
 
   return createParser(logic, op, {
     type: 'oneOf',
-    parses: `[${parserList}]`,
+    parses: Object.keys(parsersObj),
   });
 }
 

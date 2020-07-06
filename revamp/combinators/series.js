@@ -18,12 +18,6 @@ function series(parsers, op = {}) {
       return sepState;
     }
 
-    // LEADING SEP
-    if (op.sep && op.leading) {
-      newState = op.sep(newState);
-      if (newState.error) return sepError(newState, 'Wrong Leading Seperator');
-    }
-
     for (const key in parsers) {
       const parser = parsers[key];
       newState = parser(newState);
@@ -51,12 +45,6 @@ function series(parsers, op = {}) {
         newState = op.sep(newState);
         if (newState.error) return sepError(newState, 'Wrong Seperator');
       }
-    }
-
-    // TRAILING SEP
-    if (op.sep && op.trailing) {
-      newState = op.sep(newState);
-      if (newState.error) return sepError(newState, 'Wrong Trailing Seperator');
     }
 
     const parsedParsers = Object.keys(parsed).length;

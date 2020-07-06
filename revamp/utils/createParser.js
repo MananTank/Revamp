@@ -15,8 +15,9 @@ function createParser(logic, op = {}, info = { type: 'NA', parses: 'NA' }) {
       // ❌ else, EOI error
       return {
         ...state,
+        parsed: null,
         error: {
-          type: 'end of input reached',
+          type: 'unexptected end of input reached',
         },
       };
     }

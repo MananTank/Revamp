@@ -20,5 +20,6 @@ module.exports = {
     'consistent-return': 0,
     'no-plusplus': 0,
     'no-console': 0,
+    'no-underscore-dangle': 0,
   },
 };

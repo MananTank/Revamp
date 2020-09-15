@@ -23,6 +23,7 @@ function oneOf(parsersObj, op) {
         type: 'all the parsersObj failed given to oneOf()',
         errors,
       },
+      parsed: null,
     };
   };
 
